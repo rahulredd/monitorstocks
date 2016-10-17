@@ -15,9 +15,9 @@ import java.util.Set;
 import java.sql.DatabaseMetaData;
 
 public class DbConn {
-	private static String url = "jdbc:mysql://sql3.freemysqlhosting.net:3306/sql3140183";
-	private static String user = "sql3140183";
-	private static String password = "tnW2UJQenc";
+	private static String url = "jdbc:mysql://localhost:3306/stockmonitor";
+	private static String user = "root";
+	private static String password = "root";
 
 	public Connection getDbConn() throws ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver");
