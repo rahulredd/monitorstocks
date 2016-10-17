@@ -1,0 +1,6 @@
+com/stockmonitor/rest/FetchCompanyStocks.class
+com/stockmonitor/dao/Company.class
+com/stockmonitor/dao/StringList.class
+com/stockmonitor/dao/DbConn.class
+com/stockmonitor/rest/StockMonitorController.class
+com/stockmonitor/rest/StockCompany.class

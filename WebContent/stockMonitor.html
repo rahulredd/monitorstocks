@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>StockMonitor</title>
+</head>
+<body>
+	<h1>
+		<center>Stock Monitor</center>
+	</h1>
+	<table>
+		<tr>
+			<div id="add">
+				<td>Add a Company :</td>
+				<td><input type="text" id="nameOfCompany"
+					placeholder="Company Ticker" name="name" required></td>
+				<td><input type="submit" id="submitAdd"></td>
+			</div>
+		</tr>
+		<tr>
+			<div id="add">
+				<td>Get Company Stocks :</td>
+				<td><input type="text" id="companyStocks"
+					placeholder="Company Ticker" name="name" required></td>
+				<td><input type="submit" id="submitStock"></td>
+			</div>
+		</tr>
+		<tr>
+			<div id="delete">
+				<td>Delete a Company :</td>
+				<td><input type="text" id="deleteCompany"
+					placeholder="Company Ticker" name="name" required></td>
+				<td><input type="submit" id="submitDelete"></td>
+			</div>
+		</tr>
+
+		<tr>
+			<div id="history">
+				<td>Company Stock History :</td>
+				<td><input type="text" id="companyHistory"
+					placeholder="Company Ticker" name="name" required></td>
+				<td><input type="submit" id="submitHistory"></td>
+			</div>
+		</tr>
+
+
+		<tr>
+			<div id="list">
+				<td><label for="listCompanies" class="cell">List
+						Companies:</label></td>
+				<td><input type="button" id="listCompanies"
+					value="List Companies"></td>
+				<td><input type="button" id="listStocks" value="List Stocks"></td>
+			</div>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div id="chartContainer"
+					style="height: 300px; width: 500px;"></div></td>
+			<td></td>
+		</tr>
+	</table>
+
+	<div class="table" id="companyTable"></div>
+	<div class="table" id="companyPriceTable"></div>
+
+</body>
+<script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+<script src="http://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<link rel="stylesheet" href="style.css">
+
+<script>
+  $(document).ready(function() {
+    var rootURL = "http://localhost:8080/MonitorStocks/rest/controller";
+    $("#listStocks").click(function() {
+      $("#companyTable").empty();
+      $("#chartContainer").hide();
+      var companyPriceTable = $("#companyPriceTable");
+      companyPriceTable.empty();
+      $.ajax({
+        type : "GET",
+        url : rootURL + "/listPrices",
+        dataType : "xml",
+        success : function(xml) {
+          var $select = $("#listStocks").empty();
+          var rows = [];
+          rows.push(createTableHeadingForStocks());
+          console.log(xml);
+          $(xml).find("data").each(function(index, value) {
+            var company = $(this).find("data").context.innerHTML;
+            var row = createTableForStocks(company, index);
+            rows.push(row);
+          });
+          companyPriceTable.append(rows);
+        }
+      });
+    })
+
+    $("#listCompanies").click(function() {
+      $("#companyPriceTable").empty();
+      $("#chartContainer").hide();
+      var companyTable = $("#companyTable");
+      companyTable.empty();
+      $.ajax({
+        type : "GET",
+        url : rootURL + "/list",
+        dataType : "xml",
+        success : function(xml) {
+          var $select = $("#listCompanies").empty();
+          var rows = [];
+          rows.push(createTableHeadingForCompanies());
+          console.log(xml);
+          $(xml).find("data").each(function(index, value) {
+            var company = $(this).find("data").context.innerHTML;
+            var row = createTableForCompanies(company, index);
+            console.log(company);
+            console.log(index);
+            rows.push(row);
+          });
+          companyTable.append(rows);
+        }
+      });
+    })
+
+    function createTableForStocks(data, index) {
+      var index = index + 1;
+      var splitData = data.split(" ");
+      var $row = $("<tr>").addClass("row");
+      $("<td>").addClass("cell").text(index).appendTo($row);
+      $("<td>").addClass("cell").text(splitData[0]).appendTo($row);
+      $("<td>").addClass("cell").text(splitData[1]).appendTo($row);
+      $("<td>").addClass("cell").text(splitData[2]).appendTo($row);
+      $("<td>").addClass("cell").text(" " + splitData[3]).appendTo($row);
+      return $row;
+    }
+
+    function createTableHeadingForStocks() {
+      var row = $("<tr>").addClass("row");
+      $("<th>").addClass("cell").text(" Id ").appendTo(row);
+      $("<th>").addClass("cell").text(" Company ").appendTo(row);
+      $("<th>").addClass("cell").text(" StockPrice ").appendTo(row);
+      $("<th>").addClass("cell").text(" Date ").appendTo(row);
+      $("<th>").addClass("cell").text(" Time ").appendTo(row);
+      return row;
+    }
+
+    function createTableHeadingForCompanies() {
+      var row = $("<tr>").addClass("row");
+      $("<th>").addClass("cell").text('Id').appendTo(row);
+      $("<th>").addClass("cell").text(' Company ').appendTo(row);
+      return row;
+    }
+
+    function createTableForCompanies(data, index) {
+      var index = index + 1;
+      var $row = $("<tr>").addClass("row");
+      $("<td>").addClass("cell").text(index).appendTo($row);
+      $("<td>").addClass("cell").text(data).appendTo($row);
+      return $row;
+    }
+
+    $("#submitDelete").click(function() {
+      $("#companyTable").empty();
+      $("#companyPriceTable").empty();
+      $("#chartContainer").hide();
+      var name = $("#deleteCompany").val();
+      if (name) {
+        $.ajax({
+          type : "DELETE",
+          url : rootURL + "/delete",
+          contentType : 'text/plain',
+          data : name,
+          dataType : "json",
+          success : function(rdata) {
+
+          }
+        });
+      }
+    })
+
+    $("#submitAdd").click(function() {
+      $("#companyTable").empty();
+      $("#companyPriceTable").empty();
+      $("#nameOfCompany").attr('required', true);
+      var name = $("#nameOfCompany").val();
+      if (name) {
+        $.ajax({
+          type : "POST",
+          url : rootURL,
+          contentType : 'text/plain',
+          data : name,
+          dataType : "json",
+          success : function(rdata) {
+
+          }
+        });
+      }
+    })
+      $("#submitHistory").click(function() {
+      $("#companyTable").empty();
+      $("#companyPriceTable").empty();
+      var name = $("#companyHistory").val();
+      if (name) {
+        $.ajax({
+          type : "GET",
+          url : rootURL + "/allStocks/" + name,
+          contentType : 'text/plain',
+          data : name,
+          dataType : "json",
+          success : function(rdata) {
+            console.log(rdata[name][0].price);
+            var json = rdata[name];
+            var size = Object.keys(json).length;
+            var dataPoints = [];
+            console.log(size);
+             for (var i = 0; i < size; i++) {
+              var price = json[i].price;
+              var time = json[i].timeStamp;
+              console.log(price + " " + time)
+              dataPoints.push({ label: time, y: price });
+            } 
+             drawChart(dataPoints, name);
+          }
+        });
+      }
+    })
+     $("#submitStock").click(function() {
+      $("#companyTable").empty();
+      $("#companyPriceTable").empty();
+      var name = $("#companyStocks").val();
+      if (name) {
+        $.ajax({
+          type : "PUT",
+          url : rootURL + "/return/" + name,
+          contentType : 'text/plain',
+          data : name,
+          dataType : "json",
+          success : function(rdata) {
+            
+          }
+        });
+      }
+    })
+    
+    function drawChart(json, name) {
+         $("#chartContainer").show();
+
+      console.log(json)
+      var chart = new CanvasJS.Chart("chartContainer", {
+          title:{
+            text:  name             
+          },
+          data: [              
+          {
+            type: "column",
+            dataPoints: json
+          }
+          ]
+        });
+        chart.render();
+    }
+  })
+</script>
+</html>
