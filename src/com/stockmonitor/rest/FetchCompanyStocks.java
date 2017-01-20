@@ -3,9 +3,7 @@ package com.stockmonitor.rest;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import com.stockmonitor.dao.DbConn;
-
 import java.net.*;
 import java.sql.SQLException;
 import java.io.*;
@@ -64,11 +62,11 @@ class StockCompany extends TimerTask {
 	public void run() {
 		count++;
 		if (count <= 5) {
-				try {
-					addCompanyStocks();
-				} catch (ClassNotFoundException | SQLException ex) {
-					ex.printStackTrace();
-				} 
+			try {
+				addCompanyStocks();
+			} catch (ClassNotFoundException | SQLException ex) {
+			  	ex.printStackTrace();
+		  } 
 		}
 	}
 }
