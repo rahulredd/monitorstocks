@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -98,7 +97,7 @@ public class StockMonitorController {
 			list.add(map);
 		}
 		companyMap.put(companyName, list);
-    String jsonString = gson.toJson(companyMap);
+                String jsonString = gson.toJson(companyMap);
 		System.out.println("json " + jsonString);
 		return jsonString;
 	}
